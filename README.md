@@ -46,3 +46,67 @@ This aligns with **Week 3 and Week 4** of the internship curriculum:
    ```bash
    git clone https://github.com/<your-username>/DiabetesManager.git
    cd DiabetesManager
+
+
+# 🚀 Project Setup Guide
+
+## Set up Virtual Environment
+
+```bash
+python -m venv venv
+venv\Scripts\activate   # On Windows
+```
+
+## Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Run the Flask App
+
+```bash
+python app.py
+```
+
+## Visit in Browser
+
+```cpp
+http://127.0.0.1:5000
+```
+
+## 📁 Project Structure
+
+```csharp
+DiabetesManager/
+│
+├── static/                  # CSS, JS, and Images
+├── templates/               # HTML pages
+├── venv/                    # Virtual environment (should be in .gitignore)
+├── app.py                   # Flask backend
+├── model/                   # Gemini API integration scripts
+├── db/                      # SQLite database
+├── requirements.txt         # Python dependencies
+└── README.md
+```
+
+## 🎓 Internship Learning Outcomes
+
+This project embodies the key learnings of the Edunet-Microsoft AI Internship:
+
+✅ Real-world application of supervised and unsupervised learning concepts
+
+✅ End-to-end AI workflow: data → analysis → actionable insights
+
+✅ Responsible use of AI to solve healthcare problems
+
+✅ Integration of AI models with web development
+
+---
+
+## 📬 Contact
+
+**Debshata Choudhury**  
+**AICTE ID:** STU6475d447e2a991685443655  
+**Email:** debshatachoudhury@gmail.com  
+**LinkedIn:** [linkedin.com/in/debshata](https://linkedin.com/in/debshata) *(update with actual URL)*
