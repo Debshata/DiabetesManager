@@ -109,4 +109,4 @@ This project embodies the key learnings of the Edunet-Microsoft AI Internship:
 **Debshata Choudhury**  
 **AICTE ID:** STU6475d447e2a991685443655  
 **Email:** debshatachoudhury@gmail.com  
-**LinkedIn:** [linkedin.com/in/debshata](https://linkedin.com/in/debshata) *(update with actual URL)*
+**LinkedIn:** [linkedin.com/in/debshata](https://linkedin.com/in/debshata) 
