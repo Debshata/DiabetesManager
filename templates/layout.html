@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DiabetesManager{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.0.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% if current_user.is_authenticated %}
+    <!-- Sidebar for authenticated users -->
+    <div class="sidebar">
+        <div class="text-center my-4">
+            <a href="{{ url_for('dashboard') }}" class="navbar-brand">
+                <i class="fas fa-heartbeat text-primary"></i> DiabetesManager
+            </a>
+        </div>
+        <hr class="my-2">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="{{ url_for('dashboard') }}" class="sidebar-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('medications') }}" class="sidebar-link {% if request.endpoint == 'medications' %}active{% endif %}">
+                    <i class="fas fa-pills"></i>
+                    <span>Medications</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('diet_plan') }}" class="sidebar-link {% if request.endpoint == 'diet_plan' %}active{% endif %}">
+                    <i class="fas fa-utensils"></i>
+                    <span>Diet Plan</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('exercise_plan') }}" class="sidebar-link {% if request.endpoint == 'exercise_plan' %}active{% endif %}">
+                    <i class="fas fa-running"></i>
+                    <span>Exercise Plan</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('upload') }}" class="sidebar-link {% if request.endpoint == 'upload' %}active{% endif %}">
+                    <i class="fas fa-upload"></i>
+                    <span>Upload Reports</span>
+                </a>
+            </li>
+            <li class="nav-item mt-3">
+                <a href="{{ url_for('profile') }}" class="sidebar-link {% if request.endpoint == 'profile' %}active{% endif %}">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Profile</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ url_for('logout') }}" class="sidebar-link">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main content wrapper -->
+    <div class="content-wrapper">
+        <!-- Top navigation bar -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white mb-4 rounded shadow-sm">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <span class="nav-link">
+                                <strong>Welcome, {{ current_user.first_name or current_user.username }}</strong>
+                            </span>
+                        </li>
+                    </ul>
+                    
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a href="{{ url_for('upload') }}" class="btn btn-outline-primary btn-sm me-2">
+                                <i class="fas fa-upload"></i> Upload Report
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <img src="https://ui-avatars.com/api/?name={{ current_user.first_name or current_user.username }}&background=4062bb&color=fff" 
+                                     class="rounded-circle" width="32" height="32">
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{{ url_for('profile') }}"><i class="fas fa-user-circle me-2"></i> Profile</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    {% else %}
+    <!-- Navbar for non-authenticated users -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-heartbeat text-primary"></i> DiabetesManager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary text-white px-3" href="{{ url_for('register') }}">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+    
+    <!-- Flash messages -->
+    <div class="container mt-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <!-- Page content -->
+    {% if current_user.is_authenticated %}
+        {% block content %}{% endblock %}
+    {% else %}
+        <div class="container">
+            {% block public_content %}{% endblock %}
+        </div>
+    {% endif %}
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    {% block scripts %}{% endblock %}
+</body>
+</html>

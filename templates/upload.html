@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% block title %}Upload Reports - DiabetesManager{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="page-title">Upload Medical Reports</h1>
+    
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h5 class="mb-0">Upload Blood Sugar Report</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+                        <div class="mb-4">
+                            <p>Upload your blood sugar test report PDF to get AI-powered analysis and personalized recommendations.</p>
+                            
+                            <div class="alert alert-info">
+                                <div class="d-flex">
+                                    <div class="me-3">
+                                        <i class="fas fa-info-circle fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-1"><strong>Supported formats and report types:</strong></p>
+                                        <ul class="mb-0">
+                                            <li>PDF files from lab test reports</li>
+                                            <li>Reports containing blood glucose levels</li>
+                                            <li>A1C test results</li>
+                                            <li>Fasting glucose test reports</li>
+                                            <li>Glucose tolerance test reports</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="report" class="form-label fw-bold">Select Report File</label>
+                            <input class="form-control" type="file" id="report" name="report" accept=".pdf">
+                            <div class="form-text">Maximum file size: 16MB. PDF format only.</div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload me-2"></i> Upload & Analyze
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card card-success mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">How It Works</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <div class="me-3">
+                            <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <span>1</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">Upload Your Report</h5>
+                            <p class="text-muted mb-0">Upload your blood sugar report in PDF format</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="me-3">
+                            <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <span>2</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">AI Analysis</h5>
+                            <p class="text-muted mb-0">Our AI analyzes your report and extracts key insights</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex mb-3">
+                        <div class="me-3">
+                            <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <span>3</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">Get Recommendations</h5>
+                            <p class="text-muted mb-0">Receive personalized diet and exercise recommendations</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                <span>4</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="mb-1">Take Action</h5>
+                            <p class="text-muted mb-0">Implement the suggestions to improve your health</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card card-warning">
+                <div class="card-header">
+                    <h5 class="mb-0">Privacy & Security</h5>
+                </div>
+                <div class="card-body">
+                    <p>Your health data is important to us. Here's how we keep it safe:</p>
+                    
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-lock text-primary me-2"></i>
+                            Your reports are securely stored and encrypted
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-user-shield text-primary me-2"></i>
+                            Only you can access your data
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-file-shield text-primary me-2"></i>
+                            Analysis is performed with strict privacy controls
+                        </li>
+                        <li>
+                            <i class="fas fa-trash text-primary me-2"></i>
+                            You can delete your data at any time
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

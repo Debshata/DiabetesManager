@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Dashboard (From Gemini Analysis)</h2>
+  {% if analysis_data %}
+    <div class="card mb-4">
+      <div class="card-body">
+        <h4 class="card-title text-primary">AI Insights</h4>
+        {% for insight in analysis_data.insights %}
+          <div class="mb-3">
+            <h5>{{ insight.title }}</h5>
+            <p>{{ insight.description }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h4 class="card-title text-success">Trends</h4>
+        {% for trend in analysis_data.trends %}
+          <div class="mb-3">
+            <h5>{{ trend.title }}</h5>
+            <p>{{ trend.description }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <h4 class="card-title text-danger">Concerns</h4>
+        {% for concern in analysis_data.concerns %}
+          <div class="mb-3">
+            <h5>{{ concern.title }} <span class="badge bg-danger">{{ concern.severity|capitalize }}</span></h5>
+            <p>{{ concern.description }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-warning">No analysis data available.</div>
+  {% endif %}
+</div>
+{% endblock %}

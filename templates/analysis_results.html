@@ -1,0 +1,323 @@
+{% extends "layout.html" %}
+
+{% block title %}Analysis Results - DiabetesManager{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="page-title">Blood Sugar Report Analysis</h1>
+        <div>
+            <a href="{{ url_for('upload') }}" class="btn btn-primary">
+                <i class="fas fa-upload me-2"></i> Upload Another Report
+            </a>
+        </div>
+    </div>
+    
+    <div class="row g-4">
+        <!-- Left column: Key Insights -->
+        <div class="col-lg-6">
+            <!-- Key Insights Card -->
+            <div class="card card-primary mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Key Insights</h5>
+                </div>
+                <div class="card-body">
+                    {% if analysis_data.insights %}
+                        <div class="list-group list-group-flush">
+                            {% for insight in analysis_data.insights %}
+                                <div class="list-group-item border-0 ps-0 pb-4">
+                                    <div class="d-flex">
+                                        <div class="insight-icon me-3">
+                                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                                <i class="fas fa-lightbulb text-primary fa-lg"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-2">{{ insight.title }}</h5>
+                                            <p class="mb-0">{{ insight.description }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            No specific insights found in the analysis.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Blood Sugar Trends -->
+            <div class="card card-success mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Blood Sugar Trends</h5>
+                </div>
+                <div class="card-body">
+                    {% if analysis_data.trends %}
+                        <div class="list-group list-group-flush">
+                            {% for trend in analysis_data.trends %}
+                                <div class="list-group-item border-0 ps-0 pb-4">
+                                    <div class="d-flex">
+                                        <div class="trend-icon me-3">
+                                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                                <i class="fas fa-chart-line text-success fa-lg"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-2">{{ trend.title }}</h5>
+                                            <p class="mb-0">{{ trend.description }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            No specific trends found in the analysis.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Concerns Card -->
+            <div class="card card-warning">
+                <div class="card-header">
+                    <h5 class="mb-0">Potential Concerns</h5>
+                </div>
+                <div class="card-body">
+                    {% if analysis_data.concerns %}
+                        <div class="list-group list-group-flush">
+                            {% for concern in analysis_data.concerns %}
+                                <div class="list-group-item border-0 ps-0 pb-4">
+                                    <div class="d-flex">
+                                        <div class="concern-icon me-3">
+                                            <div class="bg-opacity-10 rounded-circle p-3
+                                                {% if concern.severity == 'high' %}bg-danger
+                                                {% elif concern.severity == 'medium' %}bg-warning
+                                                {% else %}bg-info{% endif %}">
+                                                <i class="fas fa-exclamation-triangle fa-lg
+                                                {% if concern.severity == 'high' %}text-danger
+                                                {% elif concern.severity == 'medium' %}text-warning
+                                                {% else %}text-info{% endif %}"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex align-items-center mb-2">
+                                                <h5 class="mb-0 me-2">{{ concern.title }}</h5>
+                                                <span class="badge 
+                                                {% if concern.severity == 'high' %}bg-danger
+                                                {% elif concern.severity == 'medium' %}bg-warning
+                                                {% else %}bg-info{% endif %}">
+                                                    {{ concern.severity|title }} Severity
+                                                </span>
+                                            </div>
+                                            <p class="mb-0">{{ concern.description }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-success">
+                            No significant concerns identified in the analysis.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right column: Recommendations -->
+        <div class="col-lg-6">
+            <!-- Diet Recommendations Card -->
+            <div class="card card-primary mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Diet Recommendations</h5>
+                </div>
+                <div class="card-body">
+                    {% if analysis_data.diet_recommendations %}
+                        <div class="list-group list-group-flush">
+                            {% for recommendation in analysis_data.diet_recommendations %}
+                                <div class="list-group-item border-0 ps-0 pb-4">
+                                    <div class="d-flex">
+                                        <div class="recommendation-icon me-3">
+                                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                                <i class="fas fa-utensils text-primary fa-lg"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-2">{{ recommendation.title }}</h5>
+                                            <p>{{ recommendation.description }}</p>
+                                            
+                                            {% if recommendation.foods_to_include %}
+                                                <h6 class="mb-2 text-success"><i class="fas fa-check-circle me-2"></i>Foods to Include</h6>
+                                                <div class="mb-3">
+                                                    {% for food in recommendation.foods_to_include %}
+                                                        <span class="badge bg-light text-dark me-2 mb-2 p-2">{{ food }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                            
+                                            {% if recommendation.foods_to_avoid %}
+                                                <h6 class="mb-2 text-danger"><i class="fas fa-times-circle me-2"></i>Foods to Avoid</h6>
+                                                <div>
+                                                    {% for food in recommendation.foods_to_avoid %}
+                                                        <span class="badge bg-light text-dark me-2 mb-2 p-2">{{ food }}</span>
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('diet_plan') }}" class="btn btn-primary">
+                                <i class="fas fa-utensils me-2"></i> Generate Detailed Diet Plan
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            No specific diet recommendations found in the analysis.
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('diet_plan') }}" class="btn btn-primary">
+                                <i class="fas fa-utensils me-2"></i> Generate Diet Plan Anyway
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Exercise Recommendations Card -->
+            <div class="card card-success mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Exercise Recommendations</h5>
+                </div>
+                <div class="card-body">
+                    {% if analysis_data.exercise_recommendations %}
+                        <div class="list-group list-group-flush">
+                            {% for recommendation in analysis_data.exercise_recommendations %}
+                                <div class="list-group-item border-0 ps-0 pb-4">
+                                    <div class="d-flex">
+                                        <div class="recommendation-icon me-3">
+                                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                                <i class="fas 
+                                                {% if recommendation.intensity == 'low' %}fa-walking
+                                                {% elif recommendation.intensity == 'medium' %}fa-running
+                                                {% else %}fa-dumbbell{% endif %} 
+                                                text-success fa-lg"></i>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="d-flex align-items-center mb-2">
+                                                <h5 class="mb-0 me-2">{{ recommendation.title }}</h5>
+                                                <span class="badge 
+                                                {% if recommendation.intensity == 'low' %}bg-info
+                                                {% elif recommendation.intensity == 'medium' %}bg-success
+                                                {% else %}bg-warning{% endif %}">
+                                                    {{ recommendation.intensity|title }} Intensity
+                                                </span>
+                                            </div>
+                                            <p>{{ recommendation.description }}</p>
+                                            
+                                            <div class="d-flex flex-wrap">
+                                                {% if recommendation.duration %}
+                                                    <div class="me-4 mb-2">
+                                                        <strong><i class="fas fa-clock me-2"></i>Duration:</strong>
+                                                        <span>{{ recommendation.duration }}</span>
+                                                    </div>
+                                                {% endif %}
+                                                
+                                                {% if recommendation.frequency %}
+                                                    <div>
+                                                        <strong><i class="fas fa-calendar-alt me-2"></i>Frequency:</strong>
+                                                        <span>{{ recommendation.frequency }}</span>
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('exercise_plan') }}" class="btn btn-success">
+                                <i class="fas fa-running me-2"></i> Generate Detailed Exercise Plan
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            No specific exercise recommendations found in the analysis.
+                        </div>
+                        <div class="text-center mt-4">
+                            <a href="{{ url_for('exercise_plan') }}" class="btn btn-success">
+                                <i class="fas fa-running me-2"></i> Generate Exercise Plan Anyway
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Next Steps Card -->
+            <div class="card card-info">
+                <div class="card-header">
+                    <h5 class="mb-0">Next Steps</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-info-circle fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5>For Better Blood Sugar Management</h5>
+                                <ul class="mb-0">
+                                    <li>Regularly track your blood sugar readings</li>
+                                    <li>Follow the personalized diet recommendations</li>
+                                    <li>Incorporate the suggested exercises into your routine</li>
+                                    <li>Consult with your healthcare provider about the findings</li>
+                                    <li>Consider getting a follow-up test in 3 months</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-6">
+                            <a href="{{ url_for('blood_sugar') }}" class="btn btn-outline-primary w-100">
+                                <i class="fas fa-chart-line me-2"></i> Track Blood Sugar
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-home me-2"></i> Return to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PDF Preview (if needed) -->
+    {% if analysis.file_path %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Uploaded Report</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center">
+                        <a href="{{ url_for('static', filename=analysis.file_path) }}" class="btn btn-outline-primary" target="_blank">
+                            <i class="fas fa-file-pdf me-2"></i> View Original Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

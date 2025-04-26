@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %}Medications{% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Medications & Conditions</h2>
+
+  <div class="card mb-4">
+    <div class="card-body">
+      <h4 class="card-title">Medical Conditions</h4>
+      {% if medical_conditions %}
+        <ul class="list-unstyled">
+          {% for condition in medical_conditions %}
+            <li class="mb-2">
+              <i class="fas fa-chevron-right text-primary me-2"></i>
+              {{ condition }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">No medical conditions reported</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">Current Medications</h4>
+      {% if medications_list %}
+        <ul class="list-unstyled">
+          {% for med in medications_list %}
+            <li class="mb-2">
+              <i class="fas fa-pills text-primary me-2"></i>
+              {{ med }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">No medications listed</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

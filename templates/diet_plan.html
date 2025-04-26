@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}Diet Plan{% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Diet Plan</h2>
+  <form method="post">
+    <button type="submit" class="btn btn-primary mb-4">Generate New Diet Plan</button>
+  </form>
+  {% if diet_plan %}
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">{{ diet_plan.title }}</h4>
+      <p>{{ diet_plan.description }}</p>
+      <ul>
+        <li><strong>Calories:</strong> {{ diet_plan.calories }}</li>
+        <li><strong>Carbs:</strong> {{ diet_plan.carbs }}</li>
+        <li><strong>Proteins:</strong> {{ diet_plan.proteins }}</li>
+        <li><strong>Fats:</strong> {{ diet_plan.fats }}</li>
+      </ul>
+    </div>
+  </div>
+  {% else %}
+    <p>No diet plan available yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

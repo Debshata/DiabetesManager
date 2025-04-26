@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block title %}Exercise Plan{% endblock %}
+{% block content %}
+<div class="container mt-5">
+  <h2 class="mb-4">Exercise Plan</h2>
+  <form method="post">
+    <button type="submit" class="btn btn-warning mb-4">Generate New Exercise Plan</button>
+  </form>
+  {% if exercise_plan %}
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">{{ exercise_plan.title }}</h4>
+      <p>{{ exercise_plan.description }}</p>
+    </div>
+  </div>
+  {% else %}
+    <p>No exercise plan available yet.</p>
+  {% endif %}
+</div>
+{% endblock %}

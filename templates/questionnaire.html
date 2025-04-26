@@ -1,0 +1,470 @@
+{% extends "layout.html" %}
+
+{% block title %}Diabetes Health Questionnaire - DiabetesManager{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h4 class="mb-0">Health and Lifestyle Questionnaire</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-info-circle fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5>Why we need this information</h5>
+                                <p class="mb-0">This information helps us provide personalized diet and exercise recommendations based on your health profile, lifestyle, and ethnicity. Your data is secure and will only be used to improve your diabetes management.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Report Summary Section -->
+                    {% if report %}
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Report Analysis Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>We analyzed your uploaded blood sugar report and found the following key information:</p>
+                            {% if report.analysis_result %}
+                                <div class="row">
+                                    <div id="report-analysis-container"></div>
+                                </div>
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        try {
+                                            var analysisResultText = '{{ report.analysis_result|safe }}';
+                                            var container = document.getElementById('report-analysis-container');
+                                            var html = '';
+                                            
+                                            // Try to parse JSON
+                                            try {
+                                                var analysisData = JSON.parse(analysisResultText);
+                                                
+                                                // Check for insights section
+                                                if (analysisData.insights && analysisData.insights.length > 0) {
+                                                    html += '<div class="col-12 mb-3"><h6 class="border-bottom pb-2">Key Insights</h6></div>';
+                                                    analysisData.insights.forEach(function(insight) {
+                                                        html += '<div class="col-md-6 mb-3"><div class="alert alert-info">' +
+                                                            '<strong>' + insight.title + '</strong><p>' + 
+                                                            insight.description + '</p></div></div>';
+                                                    });
+                                                }
+                                                
+                                                // Check for trends section
+                                                if (analysisData.trends && analysisData.trends.length > 0) {
+                                                    html += '<div class="col-12 mb-3"><h6 class="border-bottom pb-2">Trends</h6></div>';
+                                                    analysisData.trends.forEach(function(trend) {
+                                                        html += '<div class="col-md-6 mb-3"><div class="alert alert-light">' +
+                                                            '<strong>' + trend.title + '</strong><p>' + 
+                                                            trend.description + '</p></div></div>';
+                                                    });
+                                                }
+                                                
+                                                // Check for concerns section
+                                                if (analysisData.concerns && analysisData.concerns.length > 0) {
+                                                    html += '<div class="col-12 mb-3"><h6 class="border-bottom pb-2">Concerns</h6></div>';
+                                                    analysisData.concerns.forEach(function(concern) {
+                                                        var alertClass = "alert-info";
+                                                        if (concern.severity === "high") alertClass = "alert-danger";
+                                                        else if (concern.severity === "medium") alertClass = "alert-warning";
+                                                        
+                                                        html += '<div class="col-md-6 mb-3"><div class="alert ' + alertClass + '">' +
+                                                            '<strong>' + concern.title + '</strong><p>' + 
+                                                            concern.description + '</p></div></div>';
+                                                    });
+                                                }
+                                                
+                                            } catch (jsonError) {
+                                                console.error('Error parsing JSON:', jsonError);
+                                                // If JSON parsing fails, just show a basic notification
+                                                html = '<div class="col-12"><div class="alert alert-info">' +
+                                                    '<p><strong>Report Analysis Complete</strong></p>' +
+                                                    '<p>Complete this questionnaire to get personalized recommendations based on your report.</p>' +
+                                                    '</div></div>';
+                                            }
+                                            
+                                            // If no specific data found, show general results
+                                            if (!html) {
+                                                html = '<div class="col-12"><div class="alert alert-info">' +
+                                                    '<p><strong>Report Analysis Complete</strong></p>' +
+                                                    '<p>Complete this questionnaire to get personalized recommendations based on your report.</p>' +
+                                                    '</div></div>';
+                                            }
+                                            
+                                            container.innerHTML = html;
+                                        } catch (e) {
+                                            console.error('Error processing report data:', e);
+                                            document.getElementById('report-analysis-container').innerHTML = 
+                                                '<div class="col-12"><p class="text-muted">Analysis results available after questionnaire completion.</p></div>';
+                                        }
+                                    });
+                                </script>
+                            {% else %}
+                                <p class="text-muted">Detailed analysis summary not available. Please complete the questionnaire to get personalized recommendations.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" action="{{ url_for('questionnaire', report_id=report.id) }}" id="questionnaire-form">
+                        
+                        <!-- Personal Information Section -->
+                        <h5 class="mt-4 mb-3 border-bottom pb-2">Personal Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="first_name" class="form-label">First Name*</label>
+                                <input type="text" class="form-control" id="first_name" name="first_name" value="{{ initial_data.first_name or '' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="last_name" class="form-label">Last Name*</label>
+                                <input type="text" class="form-control" id="last_name" name="last_name" value="{{ initial_data.last_name or '' }}" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="age" class="form-label">Age (years)*</label>
+                                <input type="number" class="form-control" id="age" name="age" min="18" max="120" value="{{ initial_data.age or '' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="gender" class="form-label">Gender*</label>
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="" {% if not initial_data.gender %}selected{% endif %} disabled>Select gender</option>
+                                    <option value="Male" {% if initial_data.gender == 'Male' %}selected{% endif %}>Male</option>
+                                    <option value="Female" {% if initial_data.gender == 'Female' %}selected{% endif %}>Female</option>
+                                    <option value="Other" {% if initial_data.gender == 'Other' %}selected{% endif %}>Other</option>
+                                    <option value="Prefer not to say" {% if initial_data.gender == 'Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="ethnicity" class="form-label">Ethnicity*</label>
+                                <select class="form-select" id="ethnicity" name="ethnicity" required>
+                                    <option value="" {% if not initial_data.ethnicity %}selected{% endif %} disabled>Select ethnicity</option>
+                                    <option value="African" {% if initial_data.ethnicity == 'African' %}selected{% endif %}>African</option>
+                                    <option value="Asian - East Asian" {% if initial_data.ethnicity == 'Asian - East Asian' %}selected{% endif %}>Asian - East Asian</option>
+                                    <option value="Asian - South Asian" {% if initial_data.ethnicity == 'Asian - South Asian' %}selected{% endif %}>Asian - South Asian</option>
+                                    <option value="Caucasian" {% if initial_data.ethnicity == 'Caucasian' %}selected{% endif %}>Caucasian</option>
+                                    <option value="Hispanic/Latino" {% if initial_data.ethnicity == 'Hispanic/Latino' %}selected{% endif %}>Hispanic/Latino</option>
+                                    <option value="Middle Eastern" {% if initial_data.ethnicity == 'Middle Eastern' %}selected{% endif %}>Middle Eastern</option>
+                                    <option value="Native American" {% if initial_data.ethnicity == 'Native American' %}selected{% endif %}>Native American</option>
+                                    <option value="Pacific Islander" {% if initial_data.ethnicity == 'Pacific Islander' %}selected{% endif %}>Pacific Islander</option>
+                                    <option value="Mixed" {% if initial_data.ethnicity == 'Mixed' %}selected{% endif %}>Mixed</option>
+                                    <option value="Other" {% if initial_data.ethnicity == 'Other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="diagnosed_date" class="form-label">When were you diagnosed with diabetes?*</label>
+                                <input type="date" class="form-control" id="diagnosed_date" name="diagnosed_date" value="{% if initial_data.diagnosed_date %}{{ initial_data.diagnosed_date.strftime('%Y-%m-%d') }}{% else %}{% endif %}" required>
+                            </div>
+                        </div>
+                        
+                        <!-- Physical Metrics Section -->
+                        <h5 class="mt-4 mb-3 border-bottom pb-2">Physical Metrics</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="height" class="form-label">Height (cm)*</label>
+                                <input type="number" class="form-control" id="height" name="height" min="100" max="250" step="0.1" value="{{ initial_data.height or '' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="weight" class="form-label">Weight (kg)*</label>
+                                <input type="number" class="form-control" id="weight" name="weight" min="30" max="300" step="0.1" value="{{ initial_data.weight or '' }}" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label for="diabetes_type" class="form-label">Type of Diabetes*</label>
+                                <select class="form-select" id="diabetes_type" name="diabetes_type" required>
+                                    <option value="" {% if not initial_data.diabetes_type %}selected{% endif %} disabled>Select type</option>
+                                    <option value="Type 1" {% if initial_data.diabetes_type == 'Type 1' %}selected{% endif %}>Type 1</option>
+                                    <option value="Type 2" {% if initial_data.diabetes_type == 'Type 2' %}selected{% endif %}>Type 2</option>
+                                    <option value="Gestational" {% if initial_data.diabetes_type == 'Gestational' %}selected{% endif %}>Gestational</option>
+                                    <option value="LADA" {% if initial_data.diabetes_type == 'LADA' %}selected{% endif %}>LADA (Latent Autoimmune Diabetes in Adults)</option>
+                                    <option value="MODY" {% if initial_data.diabetes_type == 'MODY' %}selected{% endif %}>MODY (Maturity Onset Diabetes of the Young)</option>
+                                    <option value="Prediabetes" {% if initial_data.diabetes_type == 'Prediabetes' %}selected{% endif %}>Prediabetes</option>
+                                    <option value="Other" {% if initial_data.diabetes_type == 'Other' %}selected{% endif %}>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <!-- Lifestyle Section -->
+                        <h5 class="mt-4 mb-3 border-bottom pb-2">Lifestyle Information</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="activity_level" class="form-label">Activity Level*</label>
+                                <select class="form-select" id="activity_level" name="activity_level" required>
+                                    <option value="" selected disabled>Select activity level</option>
+                                    <option value="Sedentary">Sedentary (little to no exercise)</option>
+                                    <option value="Lightly active">Lightly active (light exercise 1-3 days/week)</option>
+                                    <option value="Moderately active">Moderately active (moderate exercise 3-5 days/week)</option>
+                                    <option value="Very active">Very active (hard exercise 6-7 days/week)</option>
+                                    <option value="Extra active">Extra active (very hard exercise & physical job or training twice a day)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="occupation_type" class="form-label">Occupation Type*</label>
+                                <select class="form-select" id="occupation_type" name="occupation_type" required>
+                                    <option value="" selected disabled>Select occupation type</option>
+                                    <option value="Sedentary">Sedentary (mostly sitting)</option>
+                                    <option value="Light">Light (mostly standing/walking)</option>
+                                    <option value="Moderate">Moderate (physical work)</option>
+                                    <option value="Heavy">Heavy (intense physical labor)</option>
+                                    <option value="Retired">Retired</option>
+                                    <option value="Student">Student</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row g-3 mt-2">
+                            <div class="col-12">
+                                <label class="form-label">Do you have any dietary restrictions?</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="vegetarian" name="dietary_restrictions" value="Vegetarian">
+                                    <label class="form-check-label" for="vegetarian">Vegetarian</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="vegan" name="dietary_restrictions" value="Vegan">
+                                    <label class="form-check-label" for="vegan">Vegan</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="gluten_free" name="dietary_restrictions" value="Gluten-free">
+                                    <label class="form-check-label" for="gluten_free">Gluten-free</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="lactose_free" name="dietary_restrictions" value="Lactose-free">
+                                    <label class="form-check-label" for="lactose_free">Lactose-free</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="kosher" name="dietary_restrictions" value="Kosher">
+                                    <label class="form-check-label" for="kosher">Kosher</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="halal" name="dietary_restrictions" value="Halal">
+                                    <label class="form-check-label" for="halal">Halal</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="no_restrictions" name="dietary_restrictions" value="None">
+                                    <label class="form-check-label" for="no_restrictions">No restrictions</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Medical Background Section -->
+                        <h5 class="mt-4 mb-3 border-bottom pb-2">Medical Background</h5>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Do you have any of the following conditions? (Select all that apply)</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="hypertension" name="medical_conditions" value="Hypertension">
+                                    <label class="form-check-label" for="hypertension">Hypertension (High Blood Pressure)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="high_cholesterol" name="medical_conditions" value="High Cholesterol">
+                                    <label class="form-check-label" for="high_cholesterol">High Cholesterol</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="heart_disease" name="medical_conditions" value="Heart Disease">
+                                    <label class="form-check-label" for="heart_disease">Heart Disease</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="kidney_disease" name="medical_conditions" value="Kidney Disease">
+                                    <label class="form-check-label" for="kidney_disease">Kidney Disease</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="neuropathy" name="medical_conditions" value="Neuropathy">
+                                    <label class="form-check-label" for="neuropathy">Neuropathy</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="retinopathy" name="medical_conditions" value="Retinopathy">
+                                    <label class="form-check-label" for="retinopathy">Retinopathy</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="thyroid" name="medical_conditions" value="Thyroid Disorders">
+                                    <label class="form-check-label" for="thyroid">Thyroid Disorders</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="none" name="medical_conditions" value="None">
+                                    <label class="form-check-label" for="none">None of the above</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Medication Section -->
+                        <h5 class="mt-4 mb-3 border-bottom pb-2">Medications</h5>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Are you currently taking any of the following medications? (Select all that apply)</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="insulin" name="medications" value="Insulin">
+                                    <label class="form-check-label" for="insulin">Insulin</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="metformin" name="medications" value="Metformin">
+                                    <label class="form-check-label" for="metformin">Metformin</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sulfonylureas" name="medications" value="Sulfonylureas">
+                                    <label class="form-check-label" for="sulfonylureas">Sulfonylureas (e.g., Glipizide, Glyburide)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="dpp4" name="medications" value="DPP-4 Inhibitors">
+                                    <label class="form-check-label" for="dpp4">DPP-4 Inhibitors (e.g., Januvia, Tradjenta)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="sglt2" name="medications" value="SGLT2 Inhibitors">
+                                    <label class="form-check-label" for="sglt2">SGLT2 Inhibitors (e.g., Jardiance, Invokana)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="glp1" name="medications" value="GLP-1 Receptor Agonists">
+                                    <label class="form-check-label" for="glp1">GLP-1 Receptor Agonists (e.g., Ozempic, Trulicity)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="blood_pressure" name="medications" value="Blood Pressure Medication">
+                                    <label class="form-check-label" for="blood_pressure">Blood Pressure Medication</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="statins" name="medications" value="Statins">
+                                    <label class="form-check-label" for="statins">Statins (Cholesterol Medication)</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="no_meds" name="medications" value="None">
+                                    <label class="form-check-label" for="no_meds">No medications</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-12 mt-3">
+                                <label for="other_medications" class="form-label">Any other medications not listed above?</label>
+                                <textarea class="form-control" id="other_medications" name="other_medications" rows="2" placeholder="Please list any other medications you are taking"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional Information Section -->
+                        <h5 class="mt-4 mb-3 border-bottom pb-2">Additional Information</h5>
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="allergies" class="form-label">Do you have any food allergies?</label>
+                                <textarea class="form-control" id="allergies" name="allergies" rows="2" placeholder="Please list any food allergies"></textarea>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label for="additional_info" class="form-label">Is there anything else you would like to share about your health or diabetes management?</label>
+                                <textarea class="form-control" id="additional_info" name="additional_info" rows="3" placeholder="Additional information (optional)"></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">Submit and Generate Recommendations</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle dietary restrictions
+        const noRestrictionsCheckbox = document.getElementById('no_restrictions');
+        const otherRestrictionsCheckboxes = document.querySelectorAll('input[name="dietary_restrictions"]:not(#no_restrictions)');
+        
+        noRestrictionsCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                otherRestrictionsCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                    checkbox.disabled = true;
+                });
+            } else {
+                otherRestrictionsCheckboxes.forEach(checkbox => {
+                    checkbox.disabled = false;
+                });
+            }
+        });
+        
+        otherRestrictionsCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked && noRestrictionsCheckbox.checked) {
+                    noRestrictionsCheckbox.checked = false;
+                }
+            });
+        });
+        
+        // Toggle medical conditions
+        const noConditionsCheckbox = document.getElementById('none');
+        const otherConditionsCheckboxes = document.querySelectorAll('input[name="medical_conditions"]:not(#none)');
+        
+        noConditionsCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                otherConditionsCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                    checkbox.disabled = true;
+                });
+            } else {
+                otherConditionsCheckboxes.forEach(checkbox => {
+                    checkbox.disabled = false;
+                });
+            }
+        });
+        
+        otherConditionsCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked && noConditionsCheckbox.checked) {
+                    noConditionsCheckbox.checked = false;
+                }
+            });
+        });
+        
+        // Toggle medications
+        const noMedsCheckbox = document.getElementById('no_meds');
+        const otherMedsCheckboxes = document.querySelectorAll('input[name="medications"]:not(#no_meds)');
+        
+        noMedsCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                otherMedsCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                    checkbox.disabled = true;
+                });
+                document.getElementById('other_medications').disabled = true;
+            } else {
+                otherMedsCheckboxes.forEach(checkbox => {
+                    checkbox.disabled = false;
+                });
+                document.getElementById('other_medications').disabled = false;
+            }
+        });
+        
+        otherMedsCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked && noMedsCheckbox.checked) {
+                    noMedsCheckbox.checked = false;
+                    document.getElementById('other_medications').disabled = false;
+                }
+            });
+        });
+        
+        // Calculate BMI when height/weight change
+        const heightInput = document.getElementById('height');
+        const weightInput = document.getElementById('weight');
+        
+        function calculateBMI() {
+            if (heightInput.value && weightInput.value) {
+                const heightInMeters = heightInput.value / 100;
+                const bmi = (weightInput.value / (heightInMeters * heightInMeters)).toFixed(1);
+                // This is just for display - we'll calculate the actual BMI on the server side
+                console.log(`BMI: ${bmi}`);
+            }
+        }
+        
+        heightInput.addEventListener('change', calculateBMI);
+        weightInput.addEventListener('change', calculateBMI);
+    });
+</script>
+{% endblock %}
+{% endblock %}
